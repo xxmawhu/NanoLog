@@ -18,10 +18,10 @@ TEST_BUILD_DIR=test_build
 GTEST_DIR="../googletest/googletest"
 INCLUDES=-I. -ItestHelper -I${GTEST_DIR}/include
 LIBS=-L. -lgtest -lrt -pthread
-CXX_ARGS=-std=c++17 -g -O3
+CXX_ARGS=-std=c++17 -g -O3 -fPIC
 CXX?=g++
 
-all: decompressor libNanoLog.a
+all: decompressor libnanolog.so
 
 %.o: %.cc
 	$(CXX) $(CXX_ARGS) $(EXTRA_NANOLOG_FLAGS) $(INCLUDES) -c $< -o $@
@@ -32,6 +32,9 @@ $(TEST_BUILD_DIR)/%.o: %.cc
 # Builds a C++17 version of the library; the generated OBJ is only necessary for error checking
 libNanoLog.a: $(OBJECTS) $(GENERATED_OBJ)
 	ar -cr libNanoLog.a $(OBJECTS) $(GENERATED_OBJ)
+
+libnanolog.so: $(OBJECTS) $(GENERATED_OBJ)
+	g++ -shared -o libnanolog.so  $(OBJECTS) $(GENERATED_OBJ)
 
 libgtest.a:
 	$(CXX) -std=c++11 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -c $(GTEST_DIR)/src/gtest-all.cc $(LIBS)
