@@ -59,11 +59,11 @@ int main(int argc, char** argv) {
     NANO_LOG(NOTICE, "Shortend String: '%5s' and shortend float %0.2lf", randomString, 3.14159);
 
     NanoLog::printConfig();
+    runBenchmark();
     for (int i = 0; i < 3600; ++i) {
         NANO_LOG(NOTICE, "Shortend String: '%5s' and shortend float %0.2lf", randomString, 3.14159);
         sleep(5);
     }
-    // runBenchmark();
 
     // Optional: Flush all pending log messages to disk
     NanoLog::sync();
