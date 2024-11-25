@@ -152,3 +152,10 @@ make test
 ./test --gtest_filter=-*assert*
 ```
 Note: The gtest filter is used to removed tests with assert death statements in them.
+
+### build
+
+```
+cd ./runtime
+make
+```
