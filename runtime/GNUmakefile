@@ -21,7 +21,7 @@ LIBS=-L. -lgtest -lrt -pthread
 CXX_ARGS=-std=c++17 -g -O3 -fPIC
 CXX?=g++
 
-all: decompressor libnanolog.so
+all: decompressor libnanolog.so libnanolog.a install
 
 %.o: %.cc
 	$(CXX) $(CXX_ARGS) $(EXTRA_NANOLOG_FLAGS) $(INCLUDES) -c $< -o $@
@@ -30,11 +30,18 @@ $(TEST_BUILD_DIR)/%.o: %.cc
 	$(CXX) $(CXX_ARGS) -DPREPROCESSOR_NANOLOG $(EXTRA_NANOLOG_FLAGS) $(INCLUDES) -c $< -o $@
 
 # Builds a C++17 version of the library; the generated OBJ is only necessary for error checking
-libNanoLog.a: $(OBJECTS) $(GENERATED_OBJ)
-	ar -cr libNanoLog.a $(OBJECTS) $(GENERATED_OBJ)
 
 libnanolog.so: $(OBJECTS) $(GENERATED_OBJ)
 	g++ -shared -o libnanolog.so  $(OBJECTS) $(GENERATED_OBJ)
+
+libnanolog.a: $(OBJECTS) $(GENERATED_OBJ)
+	ar -crv libnanolog.a $(OBJECTS) $(GENERATED_OBJ)
+
+install: libnanolog.so libnanolog.a
+	@mkdir -p ./include/
+	@mkdir -p ./lib/
+	@cp libnanolog.* ./lib/
+	@cp *.h ./include/
 
 libgtest.a:
 	$(CXX) -std=c++11 -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -c $(GTEST_DIR)/src/gtest-all.cc $(LIBS)
@@ -47,8 +54,8 @@ PREPROCESSOR_OBJECTS=$(addprefix $(TEST_BUILD_DIR)/, $(OBJECTS))
 
 testHelper/GeneratedCode.cc: testHelper/client.cc
 	$(CXX) $(CXX_ARGS) $(EXTRA_NANOLOG_FLAGS) -E -I. testHelper/client.cc -o testHelper/client.cc.i
-	python ../preprocessor/parser.py --mapOutput="testHelper/client.map" testHelper/client.cc.i
-	python ../preprocessor/parser.py --combinedOutput="testHelper/GeneratedCode.cc" testHelper/client.map
+	python3 ../preprocessor/parser.py --mapOutput="testHelper/client.map" testHelper/client.cc.i
+	python3 ../preprocessor/parser.py --combinedOutput="testHelper/GeneratedCode.cc" testHelper/client.map
 	@rm -f testHelper/client.map testHelper/client.cc.*
 
 test: $(PREPROCESSOR_OBJECTS) $(TEST_OBJS) $(GENERATED_OBJ) libgtest.a
